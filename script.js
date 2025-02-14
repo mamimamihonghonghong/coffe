@@ -3,7 +3,7 @@ const message = document.getElementById('message');
 const sendCodeButton = document.getElementById('sendCode');
 
 // 后端服务器地址
-const serverUrl = 'http://192.168.10.18:3000';
+const serverUrl = 'https://88ca-2409-8a60-191b-c994-71c3-5cdf-743d-662.ngrok-free.app';
 
 // 模拟验证码（实际开发中应由后端生成并发送到用户手机）
 let verificationCode = '';

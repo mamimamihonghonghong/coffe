@@ -1,6 +1,7 @@
 // 获取表单和消息元素
 const coffeeOrderForm = document.getElementById('coffeeOrderForm');
 const orderMessage = document.getElementById('orderMessage');
+const serverUrl = 'https://88ca-2409-8a60-191b-c994-71c3-5cdf-743d-662.ngrok-free.app';
 
 // 监听表单提交事件
 coffeeOrderForm.addEventListener('submit', async function (event) {
