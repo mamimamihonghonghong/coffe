@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手机号注册</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>手机号注册</h1>
+        <form id="registerForm">
+            <label for="phone">手机号：</label>
+            <input type="tel" id="phone" name="phone" required>
+
+            <label for="code">验证码：</label>
+            <div class="code-container">
+                <input type="text" id="code" name="code" required>
+                <button type="button" id="sendCode">发送验证码</button>
+            </div>
+
+            <button type="submit">注册</button>
+        </form>
+        <p id="message"></p>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
