@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>积分排行榜</title>
+    <link rel="stylesheet" href="jifen.css"> 
+</head>
+<body>
+    <div class="ranking-container">
+        <div class="rank-header">
+            <div>排名</div>
+            <div>用户</div>
+            <div>积分</div>
+        </div>
+        
+        <!-- 示例数据 -->
+        <div class="rank-item">
+            <div class="rank-number">1</div>
+            <div class="user-info">
+                <span>张三</span>
+            </div>
+            <div class="points">15800</div>
+        </div>
+
+        <div class="rank-item">
+            <div class="rank-number">2</div>
+            <div class="user-info">
+                <span>李四</span>
+            </div>
+            <div class="points">14200</div>
+        </div>
+        
+        <!-- 更多数据项... -->
+    </div>
+    <div class="sign-container">
+        <input type="text" id="verification-input" class="verification-input" placeholder="姓名">
+        <button id="signBtn" class="sign-button">每日签到</button>
+        <div id="signTips" class="sign-tips"></div>
+      </div>
+    <script src="jifen.js">
+       
+    </script>
+</body>
+</html>
