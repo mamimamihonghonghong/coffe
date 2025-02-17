@@ -1,5 +1,4 @@
-// const serverUrl = 'https://c861-2409-8a60-1916-b294-508-430c-c5fc-865c.ngrok-free.app';
-const serverUrl = 'http://localhost:3000';
+const serverUrl = 'https://c861-2409-8a60-1916-b294-508-430c-c5fc-865c.ngrok-free.app';
 const container = document.querySelector('.ranking-container');
 const input = document.getElementById('verification-input');
 const signBtn = document.getElementById('signBtn');
