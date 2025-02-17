@@ -1,17 +1,12 @@
-const serverUrl = 'https://c861-2409-8a60-1916-b294-508-430c-c5fc-865c.ngrok-free.app';
-const rankingData = [
-    { rank: 3, avatar: 'https://via.placeholder.com/40', name: '王五', points: 12800 },
-    { rank: 4, avatar: 'https://via.placeholder.com/40', name: '赵六', points: 11500 },
-    { rank: 5, avatar: 'https://via.placeholder.com/40', name: '陈七', points: 9800 }
-];
-
+// const serverUrl = 'https://c861-2409-8a60-1916-b294-508-430c-c5fc-865c.ngrok-free.app';
+const serverUrl = 'http://localhost:3000';
 const container = document.querySelector('.ranking-container');
 const input = document.getElementById('verification-input');
 const signBtn = document.getElementById('signBtn');
 const signTips = document.getElementById('signTips');
+const rankingList = document.getElementById('rankingList');
 
-
-if (!input || !signBtn || !signTips) {
+if (!input || !signBtn || !signTips ) {
     console.error('必要的 DOM 元素未找到');
 } else {
     signTips.textContent = '请输入验证码后点击签到';
@@ -29,27 +24,26 @@ if (!input || !signBtn || !signTips) {
         }
     });
 
-    // 动态加载排行榜数据
-    rankingData.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'rank-item';
-        div.innerHTML = `
-            <div class="rank-number">${item.rank}</div>
-            <div class="user-info">
-                <span>${item.name}</span>
-            </div>
-            <div class="points">${item.points}</div>
-        `;
-        container.appendChild(div);
-    });
+    // 页面加载时初始化排行榜数据
+    updateRankingData();
 
     // 签到按钮点击事件
     signBtn.addEventListener('click', async () => {
-        const userName = document.getElementById('verification-input').value;
-        console.log(userName)
-        console.log("大是大非")
+        const username = input.value.trim();
+        if (!username) {
+            signTips.textContent = '请输入姓名';
+            signTips.style.color = 'red';
+            return;
+        }
+
         try {
-            const response = await fetch(`${serverUrl}/api/sign`, { method: 'POST' , body: JSON.stringify({  userName })});
+            const response = await fetch(`${serverUrl}/api/sign`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username })
+            });
             const result = await response.json();
 
             if (result.success) {
@@ -75,25 +69,40 @@ if (!input || !signBtn || !signTips) {
     });
 }
 
-// 更新排行榜数据（假设从后端获取最新数据）
+// 更新排行榜数据（从后端获取最新数据）
 async function updateRankingData() {
     try {
         const response = await fetch(`${serverUrl}/api/ranking`);
+        console.log('获取排行榜数据的响应:', response);
+
+        // 检查响应状态码
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP 错误！状态码：${response.status}，响应内容：${errorText}`);
+        }
+
         const data = await response.json();
-        container.innerHTML = ''; // 清空现有数据
-        data.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'rank-item';
-            div.innerHTML = `
-                <div class="rank-number">${item.rank}</div>
-                <div class="user-info">
-                    <img src="${item.avatar}" alt="${item.name}" class="avatar">
-                    <span>${item.name}</span>
-                </div>
-                <div class="points">${item.points}</div>
-            `;
-            container.appendChild(div);
-        });
+        console.log('获取到的排行榜数据:', data);
+
+        rankingList.innerHTML = ''; // 清空现有数据
+
+        // 确保 data 是一个数组
+        if (Array.isArray(data.data)) {
+            data.data.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'rank-item';
+                div.innerHTML = `
+                    <div class="rank-number">${item.rank}</div>
+                    <div class="user-info">
+                        <span>${item.name}</span>
+                    </div>
+                    <div class="points">${item.points}</div>
+                `;
+                rankingList.appendChild(div);
+            });
+        } else {
+            console.error('排行榜数据格式错误:', data);
+        }
     } catch (error) {
         console.error('更新排行榜失败:', error);
     }

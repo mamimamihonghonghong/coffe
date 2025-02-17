@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const app = express();
 const port = 3000;
@@ -21,7 +20,7 @@ const signRecordSchema = new mongoose.Schema({
 const SignRecord = mongoose.model('SignRecord', signRecordSchema);
 
 // 解析 JSON 请求体
-app.use(bodyParser.json());
+app.use(express.json()); 
 
 // 允许跨域请求
 app.use((req, res, next) => {
@@ -34,6 +33,7 @@ app.use((req, res, next) => {
 // 签到接口
 app.post('/api/sign', async (req, res) => {
     try {
+        console.log(req.body)
         const username = req.body.username; // 假设前端传递 userId
         console.log(username);
         
@@ -62,10 +62,41 @@ app.post('/api/sign', async (req, res) => {
 
         res.json({ success: true, points, days: consecutiveDays });
     } catch (error) {
+        console.error('Error:', error); // 打印错误信息
+        res.status(500).json({ success: false, message: '服务器错误' });
+        
+    }
+});
+// 查询积分排名接口 
+app.get('/api/ranking', async (req, res) => {
+    try {
+        const rankings = await SignRecord.aggregate([
+            {
+                $group: {
+                    _id: '$user',
+                    totalPoints: { $sum: '$points' }
+                }
+            },
+            {
+                $sort: { totalPoints: -1 }
+            },
+            {
+                $limit: 10
+            }
+        ]);
+
+        const formattedRankings = rankings.map((item, index) => ({
+            rank: index + 1,
+            name: item._id,
+            points: item.totalPoints
+        }));
+
+        res.json({ success: true, data: formattedRankings });
+    } catch (error) {
+        console.error('Error:', error);
         res.status(500).json({ success: false, message: '服务器错误' });
     }
 });
-
 // 启动服务器
 app.listen(port, () => {
     console.log(`服务器已启动，访问地址：http://localhost:${port}`);
