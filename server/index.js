@@ -1,30 +1,24 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 const app = express();
-const port = 3002;
-const fs = require('fs');
-const dataFilePath = __dirname + '/orders.json';
+const port = 3000;
 
-// 用于存储订单数据
-let orders = [];
+// 连接 MongoDB
+const MONGODB_URI = 'mongodb+srv://458397072:7q79jsR7IeRALqcr@cluster0.kr1hh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+mongoose.connect(MONGODB_URI)
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.error('MongoDB connection error:', err));
 
-// 加载订单数据
-if (fs.existsSync(dataFilePath)) {
-    orders = JSON.parse(fs.readFileSync(dataFilePath, 'utf-8'));
-}
 
-// 保存订单数据到文件
-function saveOrders() {
-    try {
-        fs.writeFileSync(dataFilePath, JSON.stringify(orders, null, 2), 'utf-8');
-        console.log('订单数据已保存到文件。');
-    } catch (error) {
-        console.error('文件写入失败：', error);
-    }
-}
-
-// 用于存储用户数据
-let users = [];
+// 定义签到记录模型
+const signRecordSchema = new mongoose.Schema({
+    user: { type: String, required: true },
+    date: { type: String, required: true },
+    points: { type: Number, required: true },
+    consecutiveDays: { type: Number, required: true }
+});
+const SignRecord = mongoose.model('SignRecord', signRecordSchema);
 
 // 解析 JSON 请求体
 app.use(bodyParser.json());
@@ -36,56 +30,44 @@ app.use((req, res, next) => {
     next();
 });
 
-// 注册接口
-app.post('/register', (req, res) => {
-    const { phone, code } = req.body;
 
-    // 校验手机号和验证码
-    if (!phone || !code) {
-        return res.status(400).json({ message: '手机号和验证码不能为空！' });
+
+
+
+
+// 签到接口
+app.post('/api/sign', async (req, res) => {
+    try {
+        const username = req.body.username; // 假设前端传递 userId
+        console.log(username);
+        
+        const today = new Date().toISOString().split('T')[0];
+        console.log(today)
+        const existingSign = await SignRecord.findOne({ user: username, date: today });
+        console.log(existingSign)
+        if (existingSign) {
+            return res.json({ success: false, message: '今日已签到' });
+        }
+
+        const lastSign = await SignRecord.findOne({ user: username }).sort({ date: -1 });
+        console.log(lastSign)
+        const consecutiveDays = lastSign ? lastSign.consecutiveDays + 1 : 1;
+    
+        console.log(consecutiveDays)
+        let points = 1;
+        if (consecutiveDays >= 5) points += 4;
+
+        await SignRecord.create({
+            user: username,
+            date: today,
+            points,
+            consecutiveDays
+        });
+
+        res.json({ success: true, points, days: consecutiveDays });
+    } catch (error) {
+        res.status(500).json({ success: false, message: '服务器错误' });
     }
-
-    // 检查手机号是否已注册
-    if (users.some(user => user.phone === phone)) {
-        return res.status(400).json({ message: '手机号已注册！' });
-    }
-
-    // 保存用户数据
-    users.push({ phone, code });
-    res.status(200).json({ message: '注册成功！' });
-});
-
-// 获取所有用户数据接口
-app.get('/users', (req, res) => {
-    res.status(200).json(users);
-});
-
-// 提交订单接口
-app.post('/order', (req, res) => {
-    const { coffeeType, quantity, notes } = req.body;
-
-    // 校验数据
-    if (!coffeeType || !quantity) {
-        return res.status(400).json({ message: '咖啡类型和数量不能为空！' });
-    }
-
-    // 保存订单数据
-    const order = {
-        id: orders.length + 1, // 生成唯一ID
-        coffeeType,
-        quantity,
-        notes,
-        timestamp: new Date().toISOString() // 添加时间戳
-    };
-    orders.push(order);
-    saveOrders(); // 保存数据到文件
-
-    res.status(200).json({ message: '订单提交成功！', order });
-});
-
-// 获取所有订单接口
-app.get('/orders', (req, res) => {
-    res.status(200).json(orders);
 });
 
 // 启动服务器
