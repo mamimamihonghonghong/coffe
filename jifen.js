@@ -36,7 +36,6 @@ if (!input || !signBtn || !signTips) {
         div.innerHTML = `
             <div class="rank-number">${item.rank}</div>
             <div class="user-info">
-                <img src="${item.avatar}" alt="${item.name}" class="avatar">
                 <span>${item.name}</span>
             </div>
             <div class="points">${item.points}</div>
