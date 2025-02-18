@@ -1,4 +1,5 @@
-const serverUrl = 'https://c861-2409-8a60-1916-b294-508-430c-c5fc-865c.ngrok-free.app';
+const serverUrl = 'https://7d1f-2409-8a60-1916-b294-508-430c-c5fc-865c.ngrok-free.app';
+// const serverUrl = 'http://localhost:3000';
 const container = document.querySelector('.ranking-container');
 const input = document.getElementById('verification-input');
 const signBtn = document.getElementById('signBtn');
@@ -71,15 +72,23 @@ if (!input || !signBtn || !signTips ) {
 // 更新排行榜数据（从后端获取最新数据）
 async function updateRankingData() {
     try {
-        const response = await fetch(`${serverUrl}/api/ranking`);
+        const response = await fetch(`${serverUrl}/api/ranking`,{
+            method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            
+                body: JSON.stringify({ })
+        });
         console.log('获取排行榜数据的响应:', response);
 
         // 检查响应状态码
         if (!response.ok) {
+            console.log('获取排行xxxx:', response);
             const errorText = await response.text();
             throw new Error(`HTTP 错误！状态码：${response.status}，响应内容：${errorText}`);
         }
-
+        
         const data = await response.json();
         console.log('获取到的排行榜数据:', data);
 

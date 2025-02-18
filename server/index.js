@@ -68,7 +68,7 @@ app.post('/api/sign', async (req, res) => {
     }
 });
 // 查询积分排名接口 
-app.get('/api/ranking', async (req, res) => {
+app.post('/api/ranking', async (req, res) => {
     try {
         const rankings = await SignRecord.aggregate([
             {
@@ -81,7 +81,7 @@ app.get('/api/ranking', async (req, res) => {
                 $sort: { totalPoints: -1 }
             },
             {
-                $limit: 10
+                $limit: 100
             }
         ]);
 
