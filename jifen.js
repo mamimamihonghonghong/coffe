@@ -9,7 +9,7 @@ const rankingList = document.getElementById('rankingList');
 if (!input || !signBtn || !signTips ) {
     console.error('必要的 DOM 元素未找到');
 } else {
-    signTips.textContent = '请输入验证码后点击签到';
+    signTips.textContent = '请输入姓名后点击签到';
 
     // 监听输入变化
     input.addEventListener('input', () => {
